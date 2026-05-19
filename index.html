@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSAOA Practice Programs - Java</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Courier New', monospace; background: #0d0d0d; color: #e0e0e0; }
+  header { background: #111; border-bottom: 2px solid #00ff88; padding: 16px 20px; position: sticky; top: 0; z-index: 100; }
+  header h1 { color: #00ff88; font-size: 1.1rem; letter-spacing: 1px; }
+  header p { color: #888; font-size: 0.75rem; margin-top: 2px; }
+  .container { max-width: 960px; margin: 0 auto; padding: 16px; }
+  .search-bar { margin: 14px 0; }
+  .search-bar input { width: 100%; padding: 8px 12px; background: #1a1a1a; border: 1px solid #333; color: #e0e0e0; font-family: 'Courier New', monospace; font-size: 0.85rem; border-radius: 4px; outline: none; }
+  .search-bar input:focus { border-color: #00ff88; }
+  .tag-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tag { padding: 4px 10px; border: 1px solid #333; border-radius: 12px; font-size: 0.7rem; cursor: pointer; background: #1a1a1a; color: #aaa; transition: all 0.15s; }
+  .tag.active, .tag:hover { border-color: #00ff88; color: #00ff88; }
+  .program-card { background: #111; border: 1px solid #222; border-radius: 6px; margin-bottom: 10px; overflow: hidden; }
+  .program-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
+  .program-header:hover { background: #161616; }
+  .program-title { font-size: 0.82rem; color: #ccc; flex: 1; }
+  .program-num { color: #00ff88; font-size: 0.8rem; margin-right: 10px; min-width: 28px; }
+  .badge { font-size: 0.65rem; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
+  .badge-hash { background: #1a2a1a; color: #4caf50; border: 1px solid #2a4a2a; }
+  .badge-heap { background: #1a1a2a; color: #7c8cf8; border: 1px solid #2a2a4a; }
+  .badge-dc   { background: #2a1a1a; color: #f87c7c; border: 1px solid #4a2a2a; }
+  .badge-graph{ background: #2a2a1a; color: #f8c87c; border: 1px solid #4a4a2a; }
+  .badge-dp   { background: #1a2a2a; color: #7cf8f8; border: 1px solid #2a4a4a; }
+  .badge-bt   { background: #2a1a2a; color: #f87cf8; border: 1px solid #4a2a4a; }
+  .badge-bnb  { background: #2a1a1a; color: #f8a07c; border: 1px solid #4a2a2a; }
+  .toggle-icon { color: #555; font-size: 0.8rem; margin-left: 8px; }
+  .code-block { display: none; padding: 14px 16px; background: #0a0a0a; border-top: 1px solid #1a1a1a; overflow-x: auto; }
+  .code-block.open { display: block; }
+  pre { font-size: 0.75rem; line-height: 1.6; white-space: pre; color: #cdd3de; }
+  .copy-btn { float: right; padding: 3px 10px; background: #1a1a1a; border: 1px solid #333; color: #888; cursor: pointer; font-size: 0.7rem; border-radius: 3px; margin-top: -2px; }
+  .copy-btn:hover { border-color: #00ff88; color: #00ff88; }
+  footer { text-align: center; padding: 20px; color: #444; font-size: 0.7rem; border-top: 1px solid #1a1a1a; margin-top: 20px; }
+  .count { color: #555; font-size: 0.75rem; margin-bottom: 10px; }
+  @media(max-width:600px){ pre { font-size: 0.68rem; } header h1 { font-size: 0.95rem; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>▸ DSAOA Practice Programs — Java</h1>
+  <p>21 programs · Hashing · Heaps · Divide &amp; Conquer · Graphs · DP · Backtracking · Branch &amp; Bound</p>
+</header>
+<div class="container">
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search programs..." oninput="filterCards()">
+  </div>
+  <div class="tag-filter">
+    <span class="tag active" onclick="filterTag(this,'all')">All</span>
+    <span class="tag" onclick="filterTag(this,'hashing')">Hashing</span>
+    <span class="tag" onclick="filterTag(this,'heap')">Heap</span>
+    <span class="tag" onclick="filterTag(this,'divide')">Divide &amp; Conquer</span>
+    <span class="tag" onclick="filterTag(this,'graph')">Graphs</span>
+    <span class="tag" onclick="filterTag(this,'dp')">Dynamic Programming</span>
+    <span class="tag" onclick="filterTag(this,'backtracking')">Backtracking</span>
+    <span class="tag" onclick="filterTag(this,'bnb')">Branch &amp; Bound</span>
+  </div>
+  <div class="count" id="count">Showing 21 of 21</div>
+  <div id="programs"></div>
+</div>
+<footer>DSAOA Sample Practice · All programs written in plain Java · No external libraries</footer>
+
+<script>
+const programs = [
+{
+  num:1, title:"Hashing with Linear Probing (Separate Chaining)",
+  tags:["hashing"],badge:"hash",badgeLabel:"Hashing",
+  code:`// Program 1: Hashing with Separate Chaining
+// Each bucket has a linked list to handle collisions
+
+import java.util.Scanner;
+
+class EmployeeNode {
+    int empId;
+    String name;
+    double salary;
+    EmployeeNode next;   // pointer to next node in chain
+
+    EmployeeNode(int id, String n, double s) {
+        empId = id;
+        name  = n;
+        salary = s;
+        next  = null;
+    }
+}
+
+class HashTableChaining {
+    int size;
+    EmployeeNode[] table;   // array of linked list heads
+
+    HashTableChaining(int s) {
+        size  = s;
+        table = new EmployeeNode[size];
+        // all slots start as null (empty chain)
+        for (int i = 0; i < size; i++) {
+            table[i] = null;
+        }
+    }
+
+    // Hash function: divide method
+    int hashFunction(int key) {
+        return key % size;
+    }
+
+    // Insert: always add at beginning of chain (O(1))
+    void insert(int id, String name, double salary) {
+        int index = hashFunction(id);
+        EmployeeNode newNode = new EmployeeNode(id, name, salary);
+        // attach existing chain after new node
+        newNode.next = table[index];
+        table[index] = newNode;
+        System.out.println("Inserted emp " + id + " at index " + index);
+    }
+
+    // Search by employee ID
+    void search(int id) {
+        int index = hashFunction(id);
+        EmployeeNode curr = table[index];
+        while (curr != null) {
+            if (curr.empId == id) {
+                System.out.println("Found: ID=" + curr.empId +
+                    " Name=" + curr.name + " Salary=" + curr.salary);
+                return;
+            }
+            curr = curr.next;
+        }
+        System.out.println("Employee " + id + " not found.");
+    }
+
+    // Display entire hash table
+    void display() {
+        System.out.println("\\n--- Hash Table (Separate Chaining) ---");
+        for (int i = 0; i < size; i++) {
+            System.out.print("Index " + i + ": ");
+            EmployeeNode curr = table[i];
+            while (curr != null) {
+                System.out.print("[" + curr.empId + "," + curr.name + "] -> ");
+                curr = curr.next;
+            }
+            System.out.println("null");
+        }
+    }
+}
+
+public class Prog1_SeparateChaining {
+    public static void main(String[] args) {
+        HashTableChaining ht = new HashTableChaining(7);
+
+        // Insert some employees
+        ht.insert(101, "Alice", 50000);
+        ht.insert(108, "Bob",   60000);   // 108 % 7 = 3, same as 101%7? no, 101%7=3, 108%7=3 -> collision!
+        ht.insert(115, "Carol", 55000);
+        ht.insert(202, "Dave",  70000);
+        ht.insert(209, "Eve",   65000);
+
+        ht.display();
+
+        // Search
+        System.out.println("\\nSearching for ID 108:");
+        ht.search(108);
+        System.out.println("Searching for ID 999:");
+        ht.search(999);
+    }
+}`
+},
+{
+  num:2, title:"Hashing with Chaining Without Replacement",
+  tags:["hashing"],badge:"hash",badgeLabel:"Hashing",
+  code:`// Program 2: Chaining Without Replacement (Coalesced Hashing)
+// If collision: new element goes into the next free slot,
+// original element stays. Chain is built using a 'next' index array.
+
+import java.util.Scanner;
+
+public class Prog2_ChainingWithoutReplacement {
+
+    static int SIZE = 10;
+    static int[] empId   = new int[SIZE];
+    static String[] name = new String[SIZE];
+    static double[] sal  = new double[SIZE];
+    static int[] next    = new int[SIZE];  // stores index of next node in chain (-1 = end)
+    static boolean[] occupied = new boolean[SIZE];
+
+    static void initialize() {
+        for (int i = 0; i < SIZE; i++) {
+            occupied[i] = false;
+            next[i]     = -1;
+        }
+    }
+
+    // Simple hash function
+    static int hash(int key) {
+        return key % SIZE;
+    }
+
+    // Find next free slot (linear scan)
+    static int nextFree() {
+        for (int i = SIZE - 1; i >= 0; i--) {   // scan from end
+            if (!occupied[i]) return i;
+        }
+        return -1;  // table full
+    }
+
+    static void insert(int id, String n, double s) {
+        int index = hash(id);
+
+        if (!occupied[index]) {
+            // slot is free: place here
+            empId[index]    = id;
+            name[index]     = n;
+            sal[index]      = s;
+            occupied[index] = true;
+            System.out.println("Inserted " + id + " at home index " + index);
+        } else {
+            // collision: original stays, new goes to free slot
+            // Find end of chain starting at index
+            int curr = index;
+            while (next[curr] != -1) {
+                curr = next[curr];
+            }
+            int free = nextFree();
+            if (free == -1) {
+                System.out.println("Table full! Cannot insert " + id);
+                return;
+            }
+            // place new element at free slot
+            empId[free]    = id;
+            name[free]     = n;
+            sal[free]      = s;
+            occupied[free] = true;
+            next[curr]     = free;   // link from chain end to new slot
+            System.out.println("Collision! Inserted " + id + " at slot " + free
+                + " (chained from " + curr + ")");
+        }
+    }
+
+    static void display() {
+        System.out.println("\\n--- Chaining Without Replacement ---");
+        System.out.println("Slot | EmpID | Name  | Salary | Next");
+        for (int i = 0; i < SIZE; i++) {
+            if (occupied[i]) {
+                System.out.printf("  %2d | %5d | %-6s| %6.0f | %d%n",
+                    i, empId[i], name[i], sal[i], next[i]);
+            } else {
+                System.out.printf("  %2d | empty%n", i);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        initialize();
+        insert(101, "Alice", 50000);
+        insert(111, "Bob",   60000);   // 111%10=1, collision if 101 at 1
+        insert(121, "Carol", 55000);   // 121%10=1, collision again
+        insert(205, "Dave",  70000);
+        insert(315, "Eve",   65000);   // 315%10=5
+        insert(215, "Frank", 72000);   // 215%10=5, collision
+        display();
+    }
+}`
+},
+{
+  num:3, title:"Hashing with Chaining With Replacement",
+  tags:["hashing"],badge:"hash",badgeLabel:"Hashing",
+  code:`// Program 3: Chaining With Replacement
+// If new element hashes to slot occupied by a "displaced" element,
+// the displaced element moves to a free slot; new element takes home.
+
+public class Prog3_ChainingWithReplacement {
+
+    static int SIZE = 10;
+    static int[]     empId    = new int[SIZE];
+    static String[]  empName  = new String[SIZE];
+    static double[]  empSal   = new double[SIZE];
+    static int[]     nextIdx  = new int[SIZE];   // chain pointer, -1 = none
+    static boolean[] occupied = new boolean[SIZE];
+
+    static void initialize() {
+        for (int i = 0; i < SIZE; i++) {
+            occupied[i] = false;
+            nextIdx[i]  = -1;
+        }
+    }
+
+    static int hash(int key) { return key % SIZE; }
+
+    static int findFreeSlot() {
+        for (int i = SIZE - 1; i >= 0; i--)
+            if (!occupied[i]) return i;
+        return -1;
+    }
+
+    static void insert(int id, String n, double s) {
+        int home = hash(id);
+
+        if (!occupied[home]) {
+            // Easy: home slot free
+            empId[home] = id; empName[home] = n; empSal[home] = s;
+            occupied[home] = true;
+            System.out.println("Inserted " + id + " at home " + home);
+            return;
+        }
+
+        // Collision: check if occupant is at its OWN home
+        int occupantHome = hash(empId[home]);
+
+        if (occupantHome == home) {
+            // Occupant belongs here. New element goes to free slot.
+            int free = findFreeSlot();
+            if (free == -1) { System.out.println("Table full!"); return; }
+
+            // Append new element to end of occupant's chain
+            int curr = home;
+            while (nextIdx[curr] != -1) curr = nextIdx[curr];
+
+            empId[free] = id; empName[free] = n; empSal[free] = s;
+            occupied[free] = true;
+            nextIdx[curr] = free;
+            System.out.println("Collision: " + id + " chained to slot " + free);
+
+        } else {
+            // Occupant is displaced (not at its real home). Move occupant away.
+            int free = findFreeSlot();
+            if (free == -1) { System.out.println("Table full!"); return; }
+
+            // Copy occupant to free slot
+            empId[free]    = empId[home];
+            empName[free]  = empName[home];
+            empSal[free]   = empSal[home];
+            nextIdx[free]  = nextIdx[home];
+            occupied[free] = true;
+
+            // Fix the pointer of whoever was pointing to 'home'
+            int prev = occupantHome;
+            while (nextIdx[prev] != home) prev = nextIdx[prev];
+            nextIdx[prev] = free;
+
+            // Now place new element at home
+            empId[home]    = id; empName[home] = n; empSal[home] = s;
+            nextIdx[home]  = -1; occupied[home] = true;
+            System.out.println("Replaced displaced occupant. " + id + " at home " + home);
+        }
+    }
+
+    static void display() {
+        System.out.println("\\n--- Chaining With Replacement ---");
+        System.out.println("Slot | EmpID | Name  | Next");
+        for (int i = 0; i < SIZE; i++) {
+            if (occupied[i])
+                System.out.printf("  %2d | %5d | %-6s| %d%n",
+                    i, empId[i], empName[i], nextIdx[i]);
+            else
+                System.out.printf("  %2d | ----%n", i);
+        }
+    }
+
+    public static void main(String[] args) {
+        initialize();
+        insert(101, "Alice", 50000);
+        insert(111, "Bob",   60000);
+        insert(121, "Carol", 55000);
+        insert(201, "Dave",  70000);
+        insert(301, "Eve",   65000);
+        insert(211, "Frank", 72000);
+        display();
+    }
+}`
+},
+{
+  num:4, title:"Student Records - Quadratic Probing",
+  tags:["hashing"],badge:"hash",badgeLabel:"Hashing",
+  code:`// Program 4: Student Records using Quadratic Probing
+// probe sequence: h(k), h(k)+1^2, h(k)+2^2, h(k)+3^2 ...
+
+public class Prog4_QuadraticProbing {
+
+    static int SIZE = 11;   // prime size works better for quadratic probing
+    static int[]    rollNo = new int[SIZE];
+    static String[] sName  = new String[SIZE];
+    static double[] marks  = new double[SIZE];
+    static boolean[] used  = new boolean[SIZE];
+
+    static void initialize() {
+        for (int i = 0; i < SIZE; i++) used[i] = false;
+    }
+
+    static int hash(int key) { return key % SIZE; }
+
+    static void insert(int roll, String name, double m) {
+        int home = hash(roll);
+        int i = 0;
+        while (i < SIZE) {
+            int probe = (home + i * i) % SIZE;   // quadratic probe
+            if (!used[probe]) {
+                rollNo[probe] = roll;
+                sName[probe]  = name;
+                marks[probe]  = m;
+                used[probe]   = true;
+                if (i == 0)
+                    System.out.println("Inserted Roll " + roll + " at index " + probe);
+                else
+                    System.out.println("Collision! Roll " + roll
+                        + " placed at probe " + i + " -> index " + probe);
+                return;
+            }
+            i++;
+        }
+        System.out.println("Table full! Cannot insert Roll " + roll);
+    }
+
+    static void search(int roll) {
+        int home = hash(roll);
+        int i = 0;
+        while (i < SIZE) {
+            int probe = (home + i * i) % SIZE;
+            if (!used[probe]) break;   // empty slot means not present
+            if (rollNo[probe] == roll) {
+                System.out.println("Found: Roll=" + rollNo[probe]
+                    + " Name=" + sName[probe] + " Marks=" + marks[probe]);
+                return;
+            }
+            i++;
+        }
+        System.out.println("Roll " + roll + " not found.");
+    }
+
+    static void display() {
+        System.out.println("\\n--- Student Hash Table (Quadratic Probing) ---");
+        System.out.printf("%-6s %-8s %-15s %-6s%n","Index","Roll","Name","Marks");
+        for (int i = 0; i < SIZE; i++) {
+            if (used[i])
+                System.out.printf("%-6d %-8d %-15s %-6.1f%n",
+                    i, rollNo[i], sName[i], marks[i]);
+            else
+                System.out.printf("%-6d ----%n", i);
+        }
+    }
+
+    public static void main(String[] args) {
+        initialize();
+        insert(1001, "Amit",   85.5);
+        insert(1012, "Bina",   90.0);  // 1012%11=10
+        insert(1023, "Chetan", 78.0);  // 1023%11=10, collision -> probe 1 -> index (10+1)%11=0
+        insert(1034, "Deepa",  88.5);
+        insert(1045, "Ekta",   92.0);
+        insert(1056, "Farhan", 76.5);
+
+        display();
+
+        System.out.println("\\nSearch:");
+        search(1023);
+        search(9999);
+    }
+}`
+},
+{
+  num:5, title:"Customer Accounts - Double Hashing",
+  tags:["hashing"],badge:"hash",badgeLabel:"Hashing",
+  code:`// Program 5: Customer Account - Double Hashing
+// Two hash functions used. Step size = h2(key) to avoid clustering.
+// h1(k) = k % SIZE
+// h2(k) = PRIME - (k % PRIME)   where PRIME < SIZE
+
+public class Prog5_DoubleHashing {
+
+    static int SIZE  = 13;   // prime
+    static int PRIME = 7;    // prime smaller than SIZE
+
+    static int[]    custId  = new int[SIZE];
+    static String[] cName   = new String[SIZE];
+    static double[] balance = new double[SIZE];
+    static boolean[] used   = new boolean[SIZE];
+
+    static void initialize() {
+        for (int i = 0; i < SIZE; i++) used[i] = false;
+    }
+
+    // First hash function
+    static int h1(int key) { return key % SIZE; }
+
+    // Second hash function (step size, never 0)
+    static int h2(int key) { return PRIME - (key % PRIME); }
+
+    static void insert(int id, String name, double bal) {
+        int home = h1(id);
+        int step = h2(id);
+        int i = 0;
+        while (i < SIZE) {
+            int probe = (home + i * step) % SIZE;
+            if (!used[probe]) {
+                custId[probe]  = id;
+                cName[probe]   = name;
+                balance[probe] = bal;
+                used[probe]    = true;
+                if (i == 0)
+                    System.out.println("Inserted CustID " + id + " at index " + probe);
+                else
+                    System.out.println("Collision! CustID " + id
+                        + " at probe " + i + " (step=" + step + ") -> index " + probe);
+                return;
+            }
+            i++;
+        }
+        System.out.println("Table full!");
+    }
+
+    static void search(int id) {
+        int home = h1(id);
+        int step = h2(id);
+        int i = 0;
+        while (i < SIZE) {
+            int probe = (home + i * step) % SIZE;
+            if (!used[probe]) break;
+            if (custId[probe] == id) {
+                System.out.println("Found: ID=" + custId[probe]
+                    + " Name=" + cName[probe] + " Balance=" + balance[probe]);
+                return;
+            }
+            i++;
+        }
+        System.out.println("Customer " + id + " not found.");
+    }
+
+    static void display() {
+        System.out.println("\\n--- Customer Hash Table (Double Hashing) ---");
+        System.out.printf("%-6s %-8s %-12s %-10s%n","Index","CustID","Name","Balance");
+        for (int i = 0; i < SIZE; i++) {
+            if (used[i])
+                System.out.printf("%-6d %-8d %-12s %-10.2f%n",
+                    i, custId[i], cName[i], balance[i]);
+            else
+                System.out.printf("%-6d ----%n", i);
+        }
+    }
+
+    public static void main(String[] args) {
+        initialize();
+        insert(1001, "Alice",  5000.00);
+        insert(1014, "Bob",    8000.00);   // 1014%13=0, collision with 1001? 1001%13=0 yes
+        insert(1027, "Carol",  3000.00);
+        insert(1040, "Dave",   9000.00);
+        insert(2002, "Eve",    4500.00);
+        insert(2015, "Frank",  6000.00);
+
+        display();
+
+        System.out.println("\\nSearch:");
+        search(1014);
+        search(9999);
+    }
+}`
+},
+{
+  num:6, title:"Max Heap Creation and Display",
+  tags:["heap"],badge:"heap",badgeLabel:"Heap",
+  code:`// Program 6: Max Heap
+// Data: 10, 38, 53, 12, 17, 33, 84, 19, 27, 55
+// In a Max Heap, parent >= children
+// We store heap in a 1-indexed array for easy parent/child math
+
+public class Prog6_MaxHeap {
+
+    static int[] heap = new int[20];
+    static int   n    = 0;  // current size
+
+    // Insert one element and bubble it up
+    static void insert(int val) {
+        n++;
+        heap[n] = val;
+        int i = n;
+        // bubble up: while child > parent, swap
+        while (i > 1 && heap[i] > heap[i / 2]) {
+            int temp    = heap[i];
+            heap[i]     = heap[i / 2];
+            heap[i / 2] = temp;
+            i = i / 2;
+        }
+    }
+
+    static void display() {
+        System.out.print("Max Heap Array: ");
+        for (int i = 1; i <= n; i++) System.out.print(heap[i] + " ");
+        System.out.println();
+    }
+
+    // Display tree level by level
+    static void displayTree() {
+        System.out.println("\\nLevel-order (tree view):");
+        int level = 1, count = 0;
+        System.out.print("Level 1: ");
+        for (int i = 1; i <= n; i++) {
+            System.out.print(heap[i] + " ");
+            count++;
+            if (count == level && i < n) {
+                level *= 2;
+                count  = 0;
+                System.out.print("\\nLevel " + (int)(Math.log(i+1)/Math.log(2)+1) + ": ");
+            }
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        int[] data = {10, 38, 53, 12, 17, 33, 84, 19, 27, 55};
+        System.out.println("Inserting into Max Heap one by one:");
+
+        for (int x : data) {
+            insert(x);
+            System.out.print("After inserting " + x + ": ");
+            display();
+        }
+
+        System.out.println("\\nFinal Max Heap root (maximum element): " + heap[1]);
+        display();
+        displayTree();
+    }
+}`
+},
+{
+  num:7, title:"Min Heap Creation and Display",
+  tags:["heap"],badge:"heap",badgeLabel:"Heap",
+  code:`// Program 7: Min Heap
+// Data: 10, 38, 53, 12, 17, 33, 84, 19, 27, 43
+// In a Min Heap, parent <= children
+// Root always has minimum value
+
+public class Prog7_MinHeap {
+
+    static int[] heap = new int[20];
+    static int   n    = 0;
+
+    static void insert(int val) {
+        n++;
+        heap[n] = val;
+        int i = n;
+        // bubble up: if child < parent, swap
+        while (i > 1 && heap[i] < heap[i / 2]) {
+            int temp    = heap[i];
+            heap[i]     = heap[i / 2];
+            heap[i / 2] = temp;
+            i = i / 2;
+        }
+    }
+
+    static void display() {
+        System.out.print("Min Heap Array: ");
+        for (int i = 1; i <= n; i++) System.out.print(heap[i] + " ");
+        System.out.println();
+    }
+
+    // Heapify down from index i (used after deletion too)
+    static void heapifyDown(int i) {
+        int smallest = i;
+        int left  = 2 * i;
+        int right = 2 * i + 1;
+        if (left  <= n && heap[left]  < heap[smallest]) smallest = left;
+        if (right <= n && heap[right] < heap[smallest]) smallest = right;
+        if (smallest != i) {
+            int temp        = heap[i];
+            heap[i]         = heap[smallest];
+            heap[smallest]  = temp;
+            heapifyDown(smallest);
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] data = {10, 38, 53, 12, 17, 33, 84, 19, 27, 43};
+        System.out.println("Inserting into Min Heap:");
+
+        for (int x : data) {
+            insert(x);
+            System.out.print("After inserting " + x + ": ");
+            display();
+        }
+
+        System.out.println("\\nFinal Min Heap root (minimum element): " + heap[1]);
+        display();
+    }
+}`
+},
+{
+  num:8, title:"Heap Sort",
+  tags:["heap"],badge:"heap",badgeLabel:"Heap",
+  code:`// Program 8: Heap Sort
+// Data: 10, 38, 53, 12, 17, 33, 84, 19, 27, 18
+// Step 1: Build a Max Heap from input
+// Step 2: Repeatedly extract max and place at end
+
+public class Prog8_HeapSort {
+
+    static int n;
+
+    // Heapify subtree rooted at index i, heap size = size
+    static void heapify(int[] arr, int size, int i) {
+        int largest = i;
+        int left    = 2 * i + 1;   // 0-indexed left child
+        int right   = 2 * i + 2;   // 0-indexed right child
+
+        if (left  < size && arr[left]  > arr[largest]) largest = left;
+        if (right < size && arr[right] > arr[largest]) largest = right;
+
+        if (largest != i) {
+            // swap
+            int temp     = arr[i];
+            arr[i]       = arr[largest];
+            arr[largest] = temp;
+            heapify(arr, size, largest);  // fix the affected subtree
+        }
+    }
+
+    static void heapSort(int[] arr) {
+        n = arr.length;
+
+        // Step 1: Build max heap
+        // Start from last non-leaf node and heapify each
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(arr, n, i);
+        }
+        System.out.print("Max Heap: ");
+        printArr(arr);
+
+        // Step 2: Extract elements one by one
+        for (int i = n - 1; i > 0; i--) {
+            // Move current root (max) to end
+            int temp  = arr[0];
+            arr[0]    = arr[i];
+            arr[i]    = temp;
+            // Heapify reduced heap
+            heapify(arr, i, 0);
+        }
+    }
+
+    static void printArr(int[] arr) {
+        for (int x : arr) System.out.print(x + " ");
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        int[] data = {10, 38, 53, 12, 17, 33, 84, 19, 27, 18};
+
+        System.out.print("Original array: ");
+        printArr(data);
+
+        heapSort(data);
+
+        System.out.print("Sorted array  : ");
+        printArr(data);
+    }
+}`
+},
+{
+  num:9, title:"Priority Queue using Max Heap",
+  tags:["heap"],badge:"heap",badgeLabel:"Heap",
+  code:`// Program 9: Priority Queue using Max Heap
+// Elements: 45, 12, 89, 33, 56, 78, 10, 99
+// Max heap -> highest priority = largest value
+
+public class Prog9_PriorityQueue {
+
+    static int[] heap = new int[50];
+    static int   n    = 0;
+
+    // Insert element (enqueue)
+    static void enqueue(int val) {
+        n++;
+        heap[n] = val;
+        // bubble up
+        int i = n;
+        while (i > 1 && heap[i] > heap[i / 2]) {
+            int temp    = heap[i];
+            heap[i]     = heap[i / 2];
+            heap[i / 2] = temp;
+            i = i / 2;
+        }
+        System.out.println("Enqueued: " + val + "  | Heap: " + heapStr());
+    }
+
+    // Delete max (dequeue highest priority)
+    static int dequeue() {
+        if (n == 0) {
+            System.out.println("Priority queue is empty!");
+            return -1;
+        }
+        int max = heap[1];     // root has maximum
+        heap[1] = heap[n];     // move last to root
+        n--;
+        // bubble down (heapify)
+        heapifyDown(1);
+        System.out.println("Dequeued: " + max + " | Heap: " + heapStr());
+        return max;
+    }
+
+    static void heapifyDown(int i) {
+        int largest = i;
+        int l = 2 * i, r = 2 * i + 1;
+        if (l <= n && heap[l] > heap[largest]) largest = l;
+        if (r <= n && heap[r] > heap[largest]) largest = r;
+        if (largest != i) {
+            int temp       = heap[i];
+            heap[i]        = heap[largest];
+            heap[largest]  = temp;
+            heapifyDown(largest);
+        }
+    }
+
+    static String heapStr() {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 1; i <= n; i++) {
+            sb.append(heap[i]);
+            if (i < n) sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        int[] data = {45, 12, 89, 33, 56, 78, 10, 99};
+
+        System.out.println("=== Enqueue Operations ===");
+        for (int x : data) enqueue(x);
+
+        System.out.println("\\n=== Dequeue Operations (highest priority first) ===");
+        dequeue();
+        dequeue();
+        dequeue();
+
+        System.out.println("\\nRemaining queue: " + heapStr());
+    }
+}`
+},
+{
+  num:10, title:"Min Heap with Deletion",
+  tags:["heap"],badge:"heap",badgeLabel:"Heap",
+  code:`// Program 10: Min Heap with deletion
+// Data: 50, 30, 20, 15, 10, 8, 16, 60
+// Delete min = remove root, put last element at root, heapify down
+
+public class Prog10_MinHeapDeletion {
+
+    static int[] heap = new int[20];
+    static int   n    = 0;
+
+    static void insert(int val) {
+        n++;
+        heap[n] = val;
+        int i = n;
+        while (i > 1 && heap[i] < heap[i / 2]) {
+            int tmp     = heap[i];
+            heap[i]     = heap[i / 2];
+            heap[i / 2] = tmp;
+            i = i / 2;
+        }
+    }
+
+    static void heapifyDown(int i) {
+        int smallest = i;
+        int l = 2 * i, r = 2 * i + 1;
+        if (l <= n && heap[l] < heap[smallest]) smallest = l;
+        if (r <= n && heap[r] < heap[smallest]) smallest = r;
+        if (smallest != i) {
+            int tmp        = heap[i];
+            heap[i]        = heap[smallest];
+            heap[smallest] = tmp;
+            heapifyDown(smallest);
+        }
+    }
+
+    // Delete minimum element (root)
+    static int deleteMin() {
+        if (n == 0) { System.out.println("Heap empty!"); return -1; }
+        int min  = heap[1];
+        heap[1]  = heap[n];  // replace root with last
+        n--;
+        heapifyDown(1);
+        return min;
+    }
+
+    static void display() {
+        System.out.print("Heap: ");
+        for (int i = 1; i <= n; i++) System.out.print(heap[i] + " ");
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        int[] data = {50, 30, 20, 15, 10, 8, 16, 60};
+
+        System.out.println("Building Min Heap:");
+        for (int x : data) {
+            insert(x);
+            System.out.print("Insert " + x + " -> ");
+            display();
+        }
+
+        System.out.println("\\nPerforming deletions:");
+        for (int i = 0; i < 4; i++) {
+            int del = deleteMin();
+            System.out.print("Deleted min = " + del + " -> ");
+            display();
+        }
+    }
+}`
+},
+{
+  num:11, title:"Kth Smallest Element - Divide & Conquer (Quickselect)",
+  tags:["divide"],badge:"dc",badgeLabel:"Divide & Conquer",
+  code:`// Program 11: Kth Smallest using Divide & Conquer (Quickselect)
+// Data: 34, 12, 78, 56, 23, 89, 10, 67, 45
+// Quickselect: like quicksort but recurse only on relevant partition
+
+public class Prog11_KthSmallest {
+
+    // Partition array around pivot (last element)
+    static int partition(int[] arr, int low, int high) {
+        int pivot = arr[high];  // choose last as pivot
+        int i = low - 1;        // index of smaller element
+
+        for (int j = low; j < high; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+                int tmp  = arr[i];
+                arr[i]   = arr[j];
+                arr[j]   = tmp;
+            }
+        }
+        // Place pivot at correct position
+        int tmp    = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high]  = tmp;
+        return i + 1;  // pivot index
+    }
+
+    // Quickselect: find kth smallest (k is 1-indexed)
+    static int quickSelect(int[] arr, int low, int high, int k) {
+        if (low == high) return arr[low];   // only one element
+
+        int pivotIdx = partition(arr, low, high);
+        int rank = pivotIdx - low + 1;  // rank of pivot in subarray
+
+        if (rank == k) return arr[pivotIdx];         // found!
+        else if (k < rank) return quickSelect(arr, low, pivotIdx - 1, k);
+        else               return quickSelect(arr, pivotIdx + 1, high, k - rank);
+    }
+
+    static void printArr(int[] arr, int l, int r) {
+        System.out.print("[");
+        for (int i = l; i <= r; i++) {
+            System.out.print(arr[i]);
+            if (i < r) System.out.print(", ");
+        }
+        System.out.print("]");
+    }
+
+    public static void main(String[] args) {
+        int[] data = {34, 12, 78, 56, 23, 89, 10, 67, 45};
+        System.out.print("Data: ");
+        printArr(data, 0, data.length - 1);
+        System.out.println();
+
+        // Find 1st, 3rd, 5th smallest
+        int[] ks = {1, 3, 5};
+        for (int k : ks) {
+            int[] copy = data.clone();   // keep original
+            int result = quickSelect(copy, 0, copy.length - 1, k);
+            System.out.println(k + "th smallest = " + result);
+        }
+    }
+}`
+},
+{
+  num:12, title:"Min & Max using Divide & Conquer",
+  tags:["divide"],badge:"dc",badgeLabel:"Divide & Conquer",
+  code:`// Program 12: Min and Max using Divide & Conquer
+// Data: 10, 38, 53, 12, 17, 33, 84, 19, 27, 18
+// Split array in half, find min/max in each half, combine results
+
+public class Prog12_MinMax {
+
+    static int comparisons = 0;  // count comparisons made
+
+    // Returns int[] {min, max} of arr[l..r]
+    static int[] findMinMax(int[] arr, int l, int r) {
+        // Base case: single element
+        if (l == r) {
+            return new int[]{arr[l], arr[l]};
+        }
+
+        // Base case: two elements
+        if (r == l + 1) {
+            comparisons++;
+            if (arr[l] < arr[r]) return new int[]{arr[l], arr[r]};
+            else                 return new int[]{arr[r], arr[l]};
+        }
+
+        // Divide
+        int mid = (l + r) / 2;
+        int[] left  = findMinMax(arr, l, mid);
+        int[] right = findMinMax(arr, mid + 1, r);
+
+        // Conquer: combine results
+        int minVal, maxVal;
+        comparisons++;
+        minVal = (left[0] < right[0]) ? left[0] : right[0];
+        comparisons++;
+        maxVal = (left[1] > right[1]) ? left[1] : right[1];
+
+        return new int[]{minVal, maxVal};
+    }
+
+    public static void main(String[] args) {
+        int[] data = {10, 38, 53, 12, 17, 33, 84, 19, 27, 18};
+
+        System.out.print("Array: ");
+        for (int x : data) System.out.print(x + " ");
+        System.out.println();
+
+        comparisons = 0;
+        int[] result = findMinMax(data, 0, data.length - 1);
+        System.out.println("\\nMinimum value : " + result[0]);
+        System.out.println("Maximum value : " + result[1]);
+        System.out.println("Comparisons   : " + comparisons
+            + " (linear scan would need " + (data.length - 1) + ")");
+    }
+}`
+},
+{
+  num:13, title:"Prim's Algorithm - Minimum Spanning Tree (7 nodes, 11 edges)",
+  tags:["graph"],badge:"graph",badgeLabel:"Graph",
+  code:`// Program 13: Prim's Algorithm
+// 7 nodes (0 to 6), 11 edges
+// Greedy: grow MST by always picking minimum weight edge
+// connecting visited to unvisited node
+
+public class Prog13_Prims {
+
+    static int V = 7;       // number of vertices
+    static int INF = 99999;
+
+    // Adjacency matrix: graph[i][j] = weight, 0 means no edge
+    static int[][] graph = {
+        //  0    1    2    3    4    5    6
+        {   0,   2,   0,   6,   0,   0,   0 },  // 0
+        {   2,   0,   3,   8,   5,   0,   0 },  // 1
+        {   0,   3,   0,   0,   7,   0,   0 },  // 2
+        {   6,   8,   0,   0,   0,   9,   0 },  // 3
+        {   0,   5,   7,   0,   0,   8,   0 },  // 4
+        {   0,   0,   0,   9,   8,   0,   11},  // 5
+        {   0,   0,   0,   0,   0,   11,  0 }   // 6
+    };
+
+    // Find vertex with minimum key not yet in MST
+    static int minKey(int[] key, boolean[] inMST) {
+        int min = INF, minIdx = -1;
+        for (int v = 0; v < V; v++) {
+            if (!inMST[v] && key[v] < min) {
+                min    = key[v];
+                minIdx = v;
+            }
+        }
+        return minIdx;
+    }
+
+    static void prim() {
+        int[]     key    = new int[V];       // min weight to connect to MST
+        int[]     parent = new int[V];       // MST tree edges
+        boolean[] inMST  = new boolean[V];   // is vertex in MST?
+
+        // Initialize
+        for (int i = 0; i < V; i++) { key[i] = INF; inMST[i] = false; }
+        key[0]    = 0;     // start from vertex 0
+        parent[0] = -1;    // root has no parent
+
+        for (int count = 0; count < V - 1; count++) {
+            int u = minKey(key, inMST);   // pick min key vertex
+            inMST[u] = true;
+
+            // Update keys of adjacent vertices
+            for (int v = 0; v < V; v++) {
+                // if edge exists, v not in MST, and weight < current key
+                if (graph[u][v] != 0 && !inMST[v] && graph[u][v] < key[v]) {
+                    parent[v] = u;
+                    key[v]    = graph[u][v];
+                }
+            }
+        }
+
+        // Print MST
+        System.out.println("Prim's MST:");
+        System.out.println("Edge       Weight");
+        int total = 0;
+        for (int i = 1; i < V; i++) {
+            System.out.printf("  %d - %d      %d%n", parent[i], i, graph[parent[i]][i]);
+            total += graph[parent[i]][i];
+        }
+        System.out.println("Total MST cost = " + total);
+    }
+
+    public static void main(String[] args) {
+        prim();
+    }
+}`
+},
+{
+  num:14, title:"Kruskal's Algorithm - Minimum Spanning Tree (7 nodes, 11 edges)",
+  tags:["graph"],badge:"graph",badgeLabel:"Graph",
+  code:`// Program 14: Kruskal's Algorithm
+// Sort all edges by weight, add edge if it doesn't form a cycle
+// Cycle detection using Union-Find (Disjoint Set)
+
+import java.util.Arrays;
+
+public class Prog14_Kruskals {
+
+    static int V = 7;   // vertices
+    static int E = 11;  // edges
+
+    // Edge: source, destination, weight
+    static int[][] edges = {
+        {0, 1, 2},
+        {1, 2, 3},
+        {1, 4, 5},
+        {0, 3, 6},
+        {2, 4, 7},
+        {1, 3, 8},
+        {4, 5, 8},
+        {3, 5, 9},
+        {5, 6, 11},
+        {4, 6, 14},
+        {3, 4, 15}
+    };
+
+    static int[] parent = new int[V];
+    static int[] rank   = new int[V];
+
+    // Find root with path compression
+    static int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]);  // path compression
+        return parent[x];
+    }
+
+    // Union by rank
+    static void union(int x, int y) {
+        int rootX = find(x), rootY = find(y);
+        if (rank[rootX] < rank[rootY])      parent[rootX] = rootY;
+        else if (rank[rootX] > rank[rootY]) parent[rootY] = rootX;
+        else { parent[rootY] = rootX; rank[rootX]++; }
+    }
+
+    static void kruskal() {
+        // Initialize union-find
+        for (int i = 0; i < V; i++) { parent[i] = i; rank[i] = 0; }
+
+        // Sort edges by weight (simple bubble sort for clarity)
+        for (int i = 0; i < E - 1; i++) {
+            for (int j = 0; j < E - i - 1; j++) {
+                if (edges[j][2] > edges[j + 1][2]) {
+                    int[] tmp  = edges[j];
+                    edges[j]   = edges[j + 1];
+                    edges[j+1] = tmp;
+                }
+            }
+        }
+
+        System.out.println("Kruskal's MST:");
+        System.out.println("Edge       Weight");
+        int total = 0, count = 0;
+
+        for (int i = 0; i < E && count < V - 1; i++) {
+            int u = edges[i][0], v = edges[i][1], w = edges[i][2];
+            int rootU = find(u), rootV = find(v);
+
+            if (rootU != rootV) {  // no cycle
+                union(u, v);
+                System.out.printf("  %d - %d      %d%n", u, v, w);
+                total += w;
+                count++;
+            } else {
+                System.out.printf("  %d - %d      %d  (skipped, forms cycle)%n", u, v, w);
+            }
+        }
+        System.out.println("Total MST cost = " + total);
+    }
+
+    public static void main(String[] args) {
+        kruskal();
+    }
+}`
+},
+{
+  num:15, title:"Bellman-Ford Algorithm - Shortest Path with Negative Weights",
+  tags:["graph"],badge:"graph",badgeLabel:"Graph",
+  code:`// Program 15: Bellman-Ford Algorithm
+// Handles negative edge weights
+// Detects negative weight cycles
+// Relax all edges (V-1) times
+
+public class Prog15_BellmanFord {
+
+    static int V = 5;   // vertices
+    static int E = 8;   // edges
+    static int INF = 99999;
+
+    // Each edge: {from, to, weight}
+    static int[][] edges = {
+        {0, 1,  6},
+        {0, 2,  7},
+        {1, 2,  8},
+        {1, 3,  5},
+        {1, 4, -4},
+        {2, 3, -3},
+        {2, 4,  9},
+        {3, 1, -2},
+        // {4, 3,  7},   // uncomment to test negative cycle
+    };
+
+    static void bellmanFord(int src) {
+        int[] dist = new int[V];
+
+        // Step 1: Initialize distances
+        for (int i = 0; i < V; i++) dist[i] = INF;
+        dist[src] = 0;
+
+        // Step 2: Relax all edges V-1 times
+        System.out.println("Relaxing edges:");
+        for (int iter = 1; iter <= V - 1; iter++) {
+            System.out.println("\\nIteration " + iter + ":");
+            for (int i = 0; i < edges.length; i++) {
+                int u = edges[i][0], v = edges[i][1], w = edges[i][2];
+                if (dist[u] != INF && dist[u] + w < dist[v]) {
+                    System.out.println("  Relax edge " + u + "->" + v
+                        + "  dist[" + v + "] = " + dist[u] + " + " + w
+                        + " = " + (dist[u] + w));
+                    dist[v] = dist[u] + w;
+                }
+            }
+        }
+
+        // Step 3: Check for negative weight cycle
+        System.out.println("\\nChecking for negative weight cycle:");
+        boolean hasCycle = false;
+        for (int i = 0; i < edges.length; i++) {
+            int u = edges[i][0], v = edges[i][1], w = edges[i][2];
+            if (dist[u] != INF && dist[u] + w < dist[v]) {
+                System.out.println("Negative weight cycle detected!");
+                hasCycle = true;
+                break;
+            }
+        }
+        if (!hasCycle) System.out.println("No negative weight cycle.");
+
+        // Print result
+        System.out.println("\\nShortest distances from source " + src + ":");
+        System.out.println("Vertex | Distance");
+        for (int i = 0; i < V; i++) {
+            if (dist[i] == INF) System.out.printf("  %d    | INF%n", i);
+            else                System.out.printf("  %d    | %d%n", i, dist[i]);
+        }
+    }
+
+    public static void main(String[] args) {
+        bellmanFord(0);
+    }
+}`
+},
+{
+  num:16, title:"0/1 Knapsack - Dynamic Programming (5 objects)",
+  tags:["dp"],badge:"dp",badgeLabel:"Dynamic Programming",
+  code:`// Program 16: 0/1 Knapsack using Dynamic Programming
+// 5 objects, each either taken (1) or not taken (0)
+// dp[i][w] = max value using first i items with capacity w
+
+public class Prog16_KnapsackDP {
+
+    public static void main(String[] args) {
+        int n = 5;          // number of objects
+        int W = 10;         // knapsack capacity
+
+        // Item: name, weight, value
+        String[] items  = {"Item1", "Item2", "Item3", "Item4", "Item5"};
+        int[]    weight = {  2,       3,       4,       5,       9     };
+        int[]    value  = { 6,       10,      12,      15,      25     };
+
+        // dp[i][w] = max value for first i items, capacity w
+        int[][] dp = new int[n + 1][W + 1];
+
+        System.out.println("Building DP table:");
+        System.out.println("(rows = items 0..5, columns = capacity 0..10)");
+
+        // Fill table
+        for (int i = 1; i <= n; i++) {
+            for (int w = 0; w <= W; w++) {
+                // Don't take item i
+                dp[i][w] = dp[i - 1][w];
+                // Take item i if it fits
+                if (weight[i - 1] <= w) {
+                    int withItem = value[i - 1] + dp[i - 1][w - weight[i - 1]];
+                    if (withItem > dp[i][w]) dp[i][w] = withItem;
+                }
+            }
+        }
+
+        // Print DP table
+        System.out.print("     ");
+        for (int w = 0; w <= W; w++) System.out.printf("%4d", w);
+        System.out.println();
+        for (int i = 0; i <= n; i++) {
+            System.out.printf("i=%2d ", i);
+            for (int w = 0; w <= W; w++) System.out.printf("%4d", dp[i][w]);
+            System.out.println();
+        }
+
+        System.out.println("\\nMaximum value = " + dp[n][W]);
+
+        // Traceback to find which items are selected
+        System.out.println("Items selected:");
+        int w = W;
+        for (int i = n; i >= 1; i--) {
+            if (dp[i][w] != dp[i - 1][w]) {
+                System.out.println("  " + items[i - 1]
+                    + " (weight=" + weight[i-1] + ", value=" + value[i-1] + ")");
+                w -= weight[i - 1];
+            }
+        }
+    }
+}`
+},
+{
+  num:17, title:"Travelling Salesman Problem - Dynamic Programming (5 cities)",
+  tags:["dp"],badge:"dp",badgeLabel:"Dynamic Programming",
+  code:`// Program 17: TSP using Dynamic Programming (Held-Karp algorithm)
+// 5 cities, find min cost Hamiltonian cycle
+// dp[mask][v] = min cost to reach city v visiting cities in 'mask'
+
+public class Prog17_TSP_DP {
+
+    static int N   = 5;
+    static int INF = 99999;
+
+    // Distance matrix (0 = no direct road, use INF)
+    static int[][] dist = {
+        // 0   1   2   3   4
+        {  0,  10, 20, 15, 25 },
+        { 10,   0, 35, 25, 20 },
+        { 20,  35,  0, 30, 10 },
+        { 15,  25, 30,  0, 20 },
+        { 25,  20, 10, 20,  0 }
+    };
+
+    // dp[mask][v] = min cost to reach v, having visited cities in mask
+    static int[][] dp;
+    static int[][] parent;  // to trace path
+
+    static void solveTSP() {
+        int FULL = (1 << N) - 1;  // all cities visited bitmask
+        dp     = new int[1 << N][N];
+        parent = new int[1 << N][N];
+
+        // Init all to INF
+        for (int i = 0; i < (1 << N); i++)
+            for (int j = 0; j < N; j++) {
+                dp[i][j]     = INF;
+                parent[i][j] = -1;
+            }
+
+        dp[1][0] = 0;  // start at city 0, only city 0 visited (bit 0 set)
+
+        // Fill DP table
+        for (int mask = 1; mask < (1 << N); mask++) {
+            for (int u = 0; u < N; u++) {
+                if ((mask & (1 << u)) == 0) continue;  // u not in mask, skip
+                if (dp[mask][u] == INF) continue;
+
+                // Try going to every unvisited city v
+                for (int v = 0; v < N; v++) {
+                    if ((mask & (1 << v)) != 0) continue;  // already visited
+                    if (dist[u][v] == 0) continue;
+
+                    int newMask = mask | (1 << v);
+                    int newCost = dp[mask][u] + dist[u][v];
+                    if (newCost < dp[newMask][v]) {
+                        dp[newMask][v]     = newCost;
+                        parent[newMask][v] = u;
+                    }
+                }
+            }
+        }
+
+        // Find best ending city (return to 0)
+        int minCost = INF, lastCity = -1;
+        for (int v = 1; v < N; v++) {
+            if (dp[FULL][v] + dist[v][0] < minCost) {
+                minCost  = dp[FULL][v] + dist[v][0];
+                lastCity = v;
+            }
+        }
+
+        System.out.println("Minimum TSP cost = " + minCost);
+
+        // Trace path
+        System.out.print("Path: 0 -> ");
+        int mask = FULL, curr = lastCity;
+        int[] path = new int[N];
+        int idx = N - 1;
+        while (curr != 0) {
+            path[idx--] = curr;
+            int prev = parent[mask][curr];
+            mask = mask ^ (1 << curr);
+            curr = prev;
+        }
+        for (int i = idx + 1; i < N; i++) System.out.print(path[i] + " -> ");
+        System.out.println("0");
+    }
+
+    public static void main(String[] args) {
+        System.out.println("TSP with 5 cities using Dynamic Programming:");
+        System.out.println("Distance Matrix:");
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) System.out.printf("%5d", dist[i][j]);
+            System.out.println();
+        }
+        System.out.println();
+        solveTSP();
+    }
+}`
+},
+{
+  num:18, title:"Graph Coloring - Backtracking (7 nodes, 11 edges)",
+  tags:["backtracking"],badge:"bt",badgeLabel:"Backtracking",
+  code:`// Program 18: Graph Coloring using Backtracking
+// 7 nodes, 11 edges
+// Assign colors to nodes so no two adjacent nodes have the same color
+// Try minimum number of colors
+
+public class Prog18_GraphColoring {
+
+    static int V = 7;
+    static int m = 3;   // number of colors to try
+
+    // Adjacency matrix
+    static int[][] graph = {
+        {0,1,0,1,0,0,0},
+        {1,0,1,0,1,0,0},
+        {0,1,0,1,1,1,0},
+        {1,0,1,0,0,1,0},
+        {0,1,1,0,0,1,0},
+        {0,0,1,1,1,0,1},
+        {0,0,0,0,0,1,0}
+    };
+
+    static int[] color = new int[V];  // color[i] = color assigned to vertex i
+
+    // Check if color c can be given to vertex v
+    static boolean isSafe(int v, int c) {
+        for (int i = 0; i < V; i++) {
+            // If i is adjacent to v and has same color, not safe
+            if (graph[v][i] == 1 && color[i] == c) return false;
+        }
+        return true;
+    }
+
+    // Backtracking function: assign color to vertex v
+    static boolean solve(int v) {
+        if (v == V) return true;  // all vertices colored!
+
+        for (int c = 1; c <= m; c++) {    // try each color
+            if (isSafe(v, c)) {
+                color[v] = c;
+                System.out.println("  Assign color " + c + " to vertex " + v);
+                if (solve(v + 1)) return true;
+                // backtrack
+                System.out.println("  Backtrack: remove color from vertex " + v);
+                color[v] = 0;
+            }
+        }
+        return false;  // no valid color found
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Graph Coloring with " + m + " colors:");
+        System.out.println("Backtracking steps:");
+
+        if (solve(0)) {
+            System.out.println("\\nSolution found!");
+            System.out.println("Vertex -> Color");
+            for (int i = 0; i < V; i++) {
+                System.out.println("  Vertex " + i + " -> Color " + color[i]);
+            }
+        } else {
+            System.out.println("No solution with " + m + " colors.");
+        }
+    }
+}`
+},
+{
+  num:19, title:"N-Queens Problem - Backtracking",
+  tags:["backtracking"],badge:"bt",badgeLabel:"Backtracking",
+  code:`// Program 19: N-Queens using Backtracking
+// Place N queens on NxN board so none attack each other
+// Queen attacks: same row, same column, same diagonal
+
+public class Prog19_NQueens {
+
+    static int N = 8;   // change to 4 for 4 queens
+    static int[] board = new int[N];  // board[i] = column of queen in row i
+    static int solutions = 0;
+
+    // Check if placing queen at (row, col) is safe
+    static boolean isSafe(int row, int col) {
+        for (int i = 0; i < row; i++) {
+            // Same column?
+            if (board[i] == col) return false;
+            // Same diagonal? (difference in rows == difference in cols)
+            if (Math.abs(board[i] - col) == Math.abs(i - row)) return false;
+        }
+        return true;
+    }
+
+    // Backtracking: place queens row by row
+    static void solve(int row) {
+        if (row == N) {
+            solutions++;
+            if (solutions == 1) {   // print first solution only
+                System.out.println("\\nSolution " + solutions + ":");
+                printBoard();
+            } else if (solutions <= 3) {
+                System.out.println("Solution " + solutions + " found (not printed).");
+            }
+            return;
+        }
+
+        for (int col = 0; col < N; col++) {
+            if (isSafe(row, col)) {
+                board[row] = col;
+                solve(row + 1);
+                board[row] = -1;  // backtrack
+            }
+        }
+    }
+
+    static void printBoard() {
+        System.out.println("  " + "+---".repeat(N) + "+");
+        for (int i = 0; i < N; i++) {
+            System.out.print("  |");
+            for (int j = 0; j < N; j++) {
+                System.out.print(board[i] == j ? " Q |" : "   |");
+            }
+            System.out.println();
+            System.out.println("  " + "+---".repeat(N) + "+");
+        }
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < N; i++) board[i] = -1;
+        System.out.println(N + "-Queens Problem using Backtracking:");
+        solve(0);
+        System.out.println("\\nTotal solutions for " + N + " queens: " + solutions);
+    }
+}`
+},
+{
+  num:20, title:"TSP - Branch and Bound (5 cities)",
+  tags:["bnb"],badge:"bnb",badgeLabel:"Branch & Bound",
+  code:`// Program 20: TSP using Branch and Bound
+// 5 cities, uses a lower bound to prune the search tree
+// Lower bound = sum of minimum 2 edges for unvisited nodes / 2
+
+import java.util.Arrays;
+
+public class Prog20_TSP_BnB {
+
+    static int N   = 5;
+    static int INF = 99999;
+
+    static int[][] cost = {
+        {INF, 10,  8, 15, 20},
+        { 10,INF,  6,  7, 14},
+        {  8,  6,INF, 12,  9},
+        { 15,  7, 12,INF, 10},
+        { 20, 14,  9, 10,INF}
+    };
+
+    static int minCost  = INF;
+    static int[] bestPath = new int[N + 1];
+    static int[] path     = new int[N + 1];
+    static boolean[] visited = new boolean[N];
+
+    // Lower bound: for each unvisited city, add min outgoing edge
+    static int lowerBound(int curr, int level, int currCost) {
+        int bound = currCost;
+        for (int i = 0; i < N; i++) {
+            if (!visited[i]) {
+                int min1 = INF, min2 = INF;
+                for (int j = 0; j < N; j++) {
+                    if (i != j && cost[i][j] < min1) {
+                        min2 = min1; min1 = cost[i][j];
+                    } else if (i != j && cost[i][j] < min2) {
+                        min2 = cost[i][j];
+                    }
+                }
+                bound += (min1 + min2);
+            }
+        }
+        return bound / 2;
+    }
+
+    static void bnb(int curr, int level, int currCost) {
+        if (level == N) {
+            // All cities visited, return to start
+            if (cost[curr][0] != INF) {
+                int totalCost = currCost + cost[curr][0];
+                if (totalCost < minCost) {
+                    minCost = totalCost;
+                    path[level] = 0;
+                    System.arraycopy(path, 0, bestPath, 0, N + 1);
+                    System.out.print("New best path: ");
+                    for (int i = 0; i <= N; i++) System.out.print(bestPath[i] + " ");
+                    System.out.println("Cost=" + minCost);
+                }
+            }
+            return;
+        }
+
+        for (int next = 0; next < N; next++) {
+            if (!visited[next] && cost[curr][next] != INF) {
+                int newCost = currCost + cost[curr][next];
+                int lb      = lowerBound(next, level, newCost);
+
+                // Prune if lower bound >= current best
+                if (lb < minCost) {
+                    visited[next] = true;
+                    path[level]   = next;
+                    bnb(next, level + 1, newCost);
+                    visited[next] = false;  // backtrack
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("TSP using Branch and Bound (5 cities):");
+        System.out.println("Cost Matrix:");
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (cost[i][j] == INF) System.out.printf("%5s", "INF");
+                else                   System.out.printf("%5d", cost[i][j]);
+            }
+            System.out.println();
+        }
+
+        visited[0] = true;
+        path[0]    = 0;
+        System.out.println("\\nSearching...");
+        bnb(0, 1, 0);
+
+        System.out.println("\\n=== Optimal Result ===");
+        System.out.print("Best Path: ");
+        for (int i = 0; i <= N; i++) System.out.print(bestPath[i] + (i < N ? " -> " : ""));
+        System.out.println("\nMinimum Cost: " + minCost);
+    }
+}`
+},
+{
+  num:21, title:"0/1 Knapsack - Branch and Bound (5 objects)",
+  tags:["bnb"],badge:"bnb",badgeLabel:"Branch & Bound",
+  code:`// Program 21: 0/1 Knapsack using Branch and Bound
+// 5 objects, uses upper bound (fractional knapsack bound) to prune
+// We use a simple queue implemented as an array (no Java Queue class)
+
+public class Prog21_KnapsackBnB {
+
+    static int n = 5;   // number of items
+    static int W = 10;  // capacity
+
+    static int[] weight = {  2,   3,   4,   5,   9  };
+    static int[] value  = {  6,  10,  12,  15,  25  };
+    static String[] name= {"A", "B", "C", "D", "E"  };
+
+    static int maxValue = 0;
+    static boolean[] bestItems = new boolean[n];
+
+    // A node in the search tree
+    static class Node {
+        int level;      // which item we are considering
+        int profit;     // profit so far
+        int weight;     // weight so far
+        float bound;    // upper bound on profit
+        boolean[] taken;// which items taken so far
+
+        Node(int l, int p, int w, float b, boolean[] t) {
+            level = l; profit = p; weight = w; bound = b;
+            taken = t.clone();
+        }
+    }
+
+    // Upper bound using fractional knapsack
+    static float upperBound(int level, int profit, int weight) {
+        if (weight >= W) return 0;
+        float bound = profit;
+        int j = level, totWeight = weight;
+
+        while (j < n && totWeight + Prog21_KnapsackBnB.weight[j] <= W) {
+            totWeight += Prog21_KnapsackBnB.weight[j];
+            bound     += value[j];
+            j++;
+        }
+        // Take fraction of next item
+        if (j < n) {
+            bound += (float)(W - totWeight) * value[j] / Prog21_KnapsackBnB.weight[j];
+        }
+        return bound;
+    }
+
+    // Simple array-based queue (max 200 nodes)
+    static Node[] queue = new Node[200];
+    static int head = 0, tail = 0;
+    static void enq(Node nd) { queue[tail++] = nd; }
+    static Node deq()        { return queue[head++]; }
+    static boolean isEmpty() { return head == tail; }
+
+    static void solve() {
+        boolean[] empty = new boolean[n];
+        Node root = new Node(-1, 0, 0, 0, empty);
+        root.bound = upperBound(0, 0, 0);
+        enq(root);
+
+        System.out.println("Branch and Bound exploration:");
+
+        while (!isEmpty()) {
+            Node curr = deq();
+            if (curr.bound <= maxValue) continue;  // prune
+
+            int nextLevel = curr.level + 1;
+            if (nextLevel >= n) continue;
+
+            // Option 1: TAKE item nextLevel
+            boolean[] newTaken = curr.taken.clone();
+            newTaken[nextLevel] = true;
+            int newProfit = curr.profit + value[nextLevel];
+            int newWeight = curr.weight + weight[nextLevel];
+
+            if (newWeight <= W && newProfit > maxValue) {
+                maxValue   = newProfit;
+                bestItems  = newTaken.clone();
+                System.out.println("  New best: take item " + name[nextLevel]
+                    + " -> profit=" + maxValue);
+            }
+
+            float b1 = upperBound(nextLevel + 1, newProfit, newWeight);
+            if (b1 > maxValue) enq(new Node(nextLevel, newProfit, newWeight, b1, newTaken));
+
+            // Option 2: SKIP item nextLevel
+            boolean[] skipTaken = curr.taken.clone();
+            float b2 = upperBound(nextLevel + 1, curr.profit, curr.weight);
+            if (b2 > maxValue) enq(new Node(nextLevel, curr.profit, curr.weight, b2, skipTaken));
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("0/1 Knapsack - Branch and Bound");
+        System.out.println("Capacity = " + W);
+        System.out.println("Items:");
+        for (int i = 0; i < n; i++)
+            System.out.printf("  %s: weight=%d value=%d%n", name[i], weight[i], value[i]);
+        System.out.println();
+
+        solve();
+
+        System.out.println("\\n=== Result ===");
+        System.out.println("Maximum profit = " + maxValue);
+        System.out.print("Items selected : ");
+        int tw = 0;
+        for (int i = 0; i < n; i++) {
+            if (bestItems[i]) {
+                System.out.print(name[i] + " ");
+                tw += weight[i];
+            }
+        }
+        System.out.println("\\nTotal weight   = " + tw + " / " + W);
+    }
+}`
+}
+];
+
+let activeTag = 'all';
+
+function badgeHtml(b, label) {
+  return `<span class="badge badge-${b}">${label}</span>`;
+}
+
+function renderPrograms(list) {
+  const container = document.getElementById('programs');
+  container.innerHTML = '';
+  document.getElementById('count').textContent =
+    'Showing ' + list.length + ' of ' + programs.length;
+
+  list.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'program-card';
+    card.innerHTML = `
+      <div class="program-header" onclick="toggleCode(this)">
+        <span class="program-num">${p.num}.</span>
+        <span class="program-title">${p.title}${badgeHtml(p.badge, p.badgeLabel)}</span>
+        <button class="copy-btn" onclick="copyCode(event, this)">Copy</button>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="code-block"><pre>${escHtml(p.code)}</pre></div>`;
+    container.appendChild(card);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggleCode(header) {
+  const block = header.nextElementSibling;
+  const icon  = header.querySelector('.toggle-icon');
+  block.classList.toggle('open');
+  icon.textContent = block.classList.contains('open') ? '▲' : '▼';
+}
+
+function copyCode(e, btn) {
+  e.stopPropagation();
+  const pre = btn.closest('.program-card').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+
+function filterTag(el, tag) {
+  activeTag = tag;
+  document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  filterCards();
+}
+
+function filterCards() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = programs.filter(p => {
+    const matchTag = activeTag === 'all' || p.tags.includes(activeTag);
+    const matchQ   = p.title.toLowerCase().includes(q) || String(p.num).includes(q);
+    return matchTag && matchQ;
+  });
+  renderPrograms(filtered);
+}
+
+renderPrograms(programs);
+</script>
+</body>
+</html>`
